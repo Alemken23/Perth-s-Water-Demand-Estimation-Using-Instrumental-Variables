@@ -1,4 +1,5 @@
 
+# load data
 d1a = read.csv("tblPricing Final Extract For ERA One 2016-17 (1) uwa.csv");
 dim(d1a[, ])
 
