@@ -104,13 +104,13 @@ summary(end.1)
 
 
 
-#Exogeneity Test 
-#The intuition is if all instruments are exogenous, then the 2SLS residual should be
-#uncorrelated with all included and excluded exogenous variables, and any linear
-#combination of them.
-#and if the intsruments are exogenous they are uncorrelated with the structural error (Ui)
+# Exogeneity Test 
+# The intuition is if all instruments are exogenous, then the 2SLS residual should be
+# uncorrelated with all included and excluded exogenous variables, and any linear
+# combination of them.
+# and if the intsruments are exogenous they are uncorrelated with the structural error (Ui)
 
-# perform an over-identification (exogeneity) test
+# Perform an over-identification (exogeneity) test
 # what is the number of over-identification restrictions q?
 
 # number of IVs - number of endogenous variables = 3-1 = 2
@@ -145,8 +145,8 @@ summary(exo)
 #2725.172
 
 # Given a small value of R2, we fail to reject the null that 
-#the instruments are all exogenous
+# the instruments are all exogenous
 # So Tier1, Tier2 and Tier3 are all strictly exogenous
-#They also are in practice, as the prices are set by
-#the Independent Pricing and Regulatory tribunal
+# They also are in practice, as the prices are set by
+# the Independent Pricing and Regulatory tribunal
 
