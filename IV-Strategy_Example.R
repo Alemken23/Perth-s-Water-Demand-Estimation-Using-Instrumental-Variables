@@ -1,19 +1,19 @@
 
-#The 2SLS Estimator and IV Strategy Code Chunks
+# The 2SLS Estimator and Instrumental Variables (IV) Strategy Code Chunks
 
-#2SLS: a generalized approach to IV estimation when there are one or more
-#endogenous variables and at least as many excluded instrument variables (order condition)
-#It uses a combination of all exogenous variables (included and
-#excluded) that has the highest correlation with the endogenous variable as the IV
+# 2SLS: a generalised approach to IV estimation when there are one or more
+# endogenous variables and at least as many excluded instrument variables (order condition)
+# It uses a combination of all exogenous variables (included and
+# excluded) that has the highest correlation with the endogenous variable as the IV
 
-#The requirements 
-#the IVs not in the population/original model
-#IVs uncorrelated with error
-#IVs correlated with Average Price
-#Obviously AP is endogenous due to simultaneity bias (water use and price jointly determined)
-#Or OVB???
+# The requirements 
+# The IVs not in the population/original model
+# IVs uncorrelated with error
+# IVs correlated with Average Price
+# AP is endogenous due to simultaneity bias (water use and price jointly determined)
+# Or OVB???
 
-#Let's take a look at Model 3
+#Let's take a look at the following model
 IV.M3<-ivreg(log(WaterUse)~log(AP)+log(Income)+log(Rain)+
                log(MidTemp) |. -log(AP)+Rtier1+Rtier2+
                Rtier3,data=PWDAD21.p)
@@ -32,7 +32,7 @@ summary(IV.M3)
 # IV and use it in a 2SLS.
 # So all the tire prices are used here
 
-# manually estimate the first and second stage of a 2SLS
+# Manually estimate the first and second stage of a 2SLS
 lm.1<-lm(log(RAP)~log(Income)+log(Rain)+log(MidTemp)+
            Rtier1+Rtier2+Rtier3,data=PWDAD21.p)
 summary(lm.1)
