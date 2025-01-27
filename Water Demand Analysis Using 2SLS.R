@@ -1,13 +1,12 @@
 
 
-#Load libraries
+#Load libraries ----------------------------------------------------------------
 
 library(plm) #Panel data analysis library
 library(AER) #Applied Econometric analysis inducing IVreg
 library(foreign)
 library(lmtest)# For hetoroskedasticity analysis
 library(carData)# Companion to applied regression 
-library(car)
 library(broom)
 library(lattice)
 library(MASS)
@@ -21,32 +20,15 @@ library(ggpubr)
 library(sandwich)
 library(gmm)
 library(systemfit)
-#install.packages("rstatix")
 library(rstatix)
-memory.limit(10000000000000)
-memory.limit()
-memory.size(max = TRUE)
 
-memory.limit()
-#data exploration #
 library(tidyverse)
 library(dyn)
 library(broom)
 library(magrittr)
 
-library("tseries")
-library("readxl")
-library("Metrics")
-library("lubridate")
-
-library("data.table")
-library("dyn")
-library("reshape2")
-
-## removing top and bottom 1% of water use
-
-#quantile(PWDAD21.5$WaterUse,.99)
-gc()
+# Data preparation -------------------------------------------------------------
+## Remove top and bottom 1% of water use
 
 quantile(PWDAD21.5$WaterUse, c(.001,.999))
 
@@ -59,8 +41,6 @@ length(unique(PWDAD21.7[,1]))
 
 ##########################
 ## removing top and bottom 1% of GRV
-
-#quantile(PWDAD21.5$WaterUse,.99)
 
 quantile(PWDAD21.7$Latest.Review.GRV, c(.02,.98),na.rm = T)
 #?trim
@@ -96,14 +76,13 @@ PWDAD21.12<- subset(PWDAD21.11, PWDAD21.11$RIncome2 > quantile(PWDAD21.11$RIncom
 PWDAD21.13<- subset(PWDAD21.12, PWDAD21.12$RIncome2 < quantile(PWDAD21.12$RIncome2,
                                                                c(.999),na.rm = T))
 
-
 dim(PWDAD21.13)
 length(unique(PWDAD21.13[,1]))
 
 
 #save(PWDAD21.13, file="PWDAD21.13.RDATA")
 
-##### Analysis Starts from here ##########################
+# Analysis starts from here ------------------------------------------------
 load("PWDAD21.13.new.RDATA")
 
 head(PWDAD21.13.new)
@@ -129,10 +108,6 @@ PWDAD21.p<- pdata.frame(PWDAD21.13.new, index=c("Account.Number","tt"),
 #rm(PWDAD21.6,PWDAD21.7,PWDAD21.8,PWDAD21.9,PWDAD21.10,PWDAD21.11,PWDAD21.12)
 gc()
 head(PWDAD21.p)
-#Set the base for temporal variable
-#summary(as.factor(PWDAD21.p$Entitlement.Type))
-#PWDAD21.p$Billingyear= as.factor(PWDAD21.p$Billingyear)
-#BillYear<-relevel(PWDAD21.p$Billingyear,ref = "2015")
 
 #Set the base for user group
 
@@ -170,16 +145,13 @@ Proprty.Type<-PWDAD21.p$Land.Use.Description
 summary(as.factor(Proprty.Type))
 ######################################################################
 ######################################################################
-gc()
 
 colnames(PWDAD21.p)
 colnames(PWDAD21.13.new)
 
 gc()
-## Run Models ##
+## Run 2SLE models ------------------------------------------------------------
 
-colnames(PWDAD21.p)
-colnames(PWDAD21.13)
 #RE-2SLS
 #log(Proprty.Sizelot)+
 II.AM1<-plm(log(WaterUse)~log(RAP.new)+ log(IndexedIncome)+
@@ -208,7 +180,6 @@ II.FE1<-plm(log(WaterUse)~log(RAP.new)+ log(IndexedIncome)+
             data=PWDAD21.p,model= "within")
 summary(II.FE1)
 
-?plm
 
 #Income model
 Income.AM1<-plm(log(WaterUse)~log(RAP.new)+ log(RIncome2)+
@@ -261,10 +232,9 @@ confint(G2SLS.MP1, level=0.90)
 
 model1<-G2SLS.MP1
 
-
 ###########################################################
-##########################################################
-## Sub-group analysis for user group
+
+# Sub-group analysis for user group -------------------------------------------
 #rm(PWDAD21.13.new)
 
 summary(as.factor(PWDAD21.p$Entitlement.Type))
@@ -287,7 +257,7 @@ Standard.1<-plm(log(WaterUse)~log(RAP.new)+ log(IndexedIncome)+
                 model= "random", inst.method = "bvk")
 summary(Standard.1)
 
-###partial adjustment model for standard user
+# Partial adjustment model for standard user--------------
 
 Standardlaged.1<-plm(log(WaterUse)~log(lag1)+log(RAP.new)+ log(IndexedIncome)+
                   log(Rain+1)+ log(MidTemp)+ PLocation+log(Proprty.Sizelot)+
@@ -522,11 +492,9 @@ Otherlaged.1<-plm(log(WaterUse)~log(lag1)+log(RAP.new)+ log(IndexedIncome)+
              model= "random", inst.method = "bvk")
 summary(Otherlaged.1)
 
-
-
 ########################################################################
-#######################################################################
-#Summer Vs Winter Model
+
+# Summer Vs Winter Model -------------------------------------------------------
 sumr.1= subset(PWDAD21.p,PWDAD21.p$amon==12|
                  PWDAD21.p$amon==1| PWDAD21.p$amon==2)
 dim(sumr.1)
@@ -608,9 +576,9 @@ SMR.MP2<-plm(log(WaterUse)~log(RMP.new)+log(IndexedIncome)+log(Rain+1)+
              inst.method = "bvk")
 summary(SMR.MP2)
 ###########################################################
-##########################################################
 
-##LR vs SR estimates for a single month
+
+# LR vs SR estimates for a single month-----------------------------------------
 gc()
 #Summer
 
@@ -772,9 +740,6 @@ summary(WNTRLaged2.RE5)
 ########################################################
 
 
-
-
-
 #Marginal Price Model
 WNTR.MP4<-plm(log(WaterUse)~log(RMP.new)+log(IndexedIncome)+log(Rain+1)+log(MidTemp)+
                 PLocation.w+ log(Lot.size.w)+ House.w+
@@ -820,11 +785,7 @@ LSGRV.w<- wintr.LS$Latest.Review.GRV
 
 
 gc()
-#log(lag1)+
-#-log(lag1)+lag2
-#Indexed Income
-#with lags
-#Lag1
+
 colnames(wintr.LS)
 REIV.WSR<-plm(log(WaterUse)~log(lag1)+log(RAP.new)+ log(IndexedIncome)+
                 log(Rain+1)+log(MidTemp)+  LSLocation.w+log(LSProprtySize.w)+
